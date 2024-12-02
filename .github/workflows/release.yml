@@ -18,6 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Setup Git credentials
+        run: |
+          git config --global user.email "github@actions.com"
+          git config --global user.name "GitHub Actions"
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -33,6 +38,11 @@ jobs:
           go install github.com/a-h/templ/cmd/templ@latest
           templ --help
 
+      - name: Switch to build branch
+        run: |
+          git checkout build
+          git merge main
+
       - name: Download Go dependencies
         run: |
           go mod download
@@ -44,10 +54,9 @@ jobs:
 
       - name: Add generated files to commit
         run: |
-          git config --global user.email "github@actions.com"
-          git config --global user.name "GitHub Actions"
           git add -f '*_templ.go'
           git commit -m "Add generated assets"
+          git push origin build
 
       - name: Create and push tag
         env:
