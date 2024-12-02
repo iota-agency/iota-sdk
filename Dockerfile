@@ -7,7 +7,7 @@ RUN case "$(uname -m)" in \
       "aarch64") ARCH="arm64" ;; \
       *) echo "Unsupported architecture: $(uname -m)" && exit 1 ;; \
     esac && \
-    curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/v3.4.15/download/tailwindcss-linux-${ARCH} && \
+    curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.15/tailwindcss-linux-${ARCH} && \
     chmod +x tailwindcss-linux-${ARCH} && \
     mv tailwindcss-linux-${ARCH} /usr/local/bin/tailwindcss
 
@@ -17,7 +17,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 RUN templ generate && go vet ./...
-RUN tailwindcss -c tailwind.config.js -i pkg/presentation/assets/css/main.css -o pkg/presentation/assets/css/main.min.css --minify --watch
+RUN tailwindcss -c tailwind.config.js -i pkg/presentation/assets/css/main.css -o pkg/presentation/assets/css/main.min.css --minify
 
 FROM install-stage AS production
 RUN go build -o run_server cmd/server/main.go
