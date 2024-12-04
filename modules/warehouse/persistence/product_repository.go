@@ -2,24 +2,23 @@ package persistence
 
 import (
 	"context"
-	product2 "github.com/iota-agency/iota-sdk/modules/warehouse/domain/aggregates/product"
+	"github.com/iota-agency/iota-sdk/modules/warehouse/domain/aggregates/product"
 	"github.com/iota-agency/iota-sdk/modules/warehouse/persistence/models"
 	"github.com/iota-agency/iota-sdk/pkg/composables"
 	"github.com/iota-agency/iota-sdk/pkg/graphql/helpers"
-	"github.com/iota-agency/iota-sdk/pkg/service"
 	"gorm.io/gorm"
 )
 
 type GormProductRepository struct{}
 
-func NewProductRepository() product2.Repository {
+func NewProductRepository() product.Repository {
 	return &GormProductRepository{}
 }
 
 func (g *GormProductRepository) tx(ctx context.Context) (*gorm.DB, error) {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return nil, service.ErrNoTx
+		return nil, composables.ErrNoTx
 	}
 	return tx.Preload("Position"), nil
 }
@@ -27,7 +26,7 @@ func (g *GormProductRepository) tx(ctx context.Context) (*gorm.DB, error) {
 func (g *GormProductRepository) GetPaginated(
 	ctx context.Context, limit, offset int,
 	sortBy []string,
-) ([]*product2.Product, error) {
+) ([]*product.Product, error) {
 	tx, err := g.tx(ctx)
 	if err != nil {
 		return nil, err
@@ -41,7 +40,7 @@ func (g *GormProductRepository) GetPaginated(
 	if err := q.Find(&entities).Error; err != nil {
 		return nil, err
 	}
-	products := make([]*product2.Product, len(entities))
+	products := make([]*product.Product, len(entities))
 	for i, entity := range entities {
 		p, err := toDomainProduct(entity)
 		if err != nil {
@@ -55,7 +54,7 @@ func (g *GormProductRepository) GetPaginated(
 func (g *GormProductRepository) Count(ctx context.Context) (int64, error) {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return 0, service.ErrNoTx
+		return 0, composables.ErrNoTx
 	}
 	var count int64
 	if err := tx.Model(&models.WarehouseProduct{}).Count(&count).Error; err != nil { //nolint:exhaustruct
@@ -64,7 +63,7 @@ func (g *GormProductRepository) Count(ctx context.Context) (int64, error) {
 	return count, nil
 }
 
-func (g *GormProductRepository) GetAll(ctx context.Context) ([]*product2.Product, error) {
+func (g *GormProductRepository) GetAll(ctx context.Context) ([]*product.Product, error) {
 	tx, err := g.tx(ctx)
 	if err != nil {
 		return nil, err
@@ -73,7 +72,7 @@ func (g *GormProductRepository) GetAll(ctx context.Context) ([]*product2.Product
 	if err := tx.Find(&entities).Error; err != nil {
 		return nil, err
 	}
-	products := make([]*product2.Product, len(entities))
+	products := make([]*product.Product, len(entities))
 	for i, entity := range entities {
 		p, err := toDomainProduct(entity)
 		if err != nil {
@@ -84,7 +83,7 @@ func (g *GormProductRepository) GetAll(ctx context.Context) ([]*product2.Product
 	return products, nil
 }
 
-func (g *GormProductRepository) GetByID(ctx context.Context, id uint) (*product2.Product, error) {
+func (g *GormProductRepository) GetByID(ctx context.Context, id uint) (*product.Product, error) {
 	tx, err := g.tx(ctx)
 	if err != nil {
 		return nil, err
@@ -96,10 +95,10 @@ func (g *GormProductRepository) GetByID(ctx context.Context, id uint) (*product2
 	return toDomainProduct(&entity)
 }
 
-func (g *GormProductRepository) Create(ctx context.Context, data *product2.Product) error {
+func (g *GormProductRepository) Create(ctx context.Context, data *product.Product) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	if err := tx.Create(toDBProduct(data)).Error; err != nil {
 		return err
@@ -107,18 +106,18 @@ func (g *GormProductRepository) Create(ctx context.Context, data *product2.Produ
 	return nil
 }
 
-func (g *GormProductRepository) CreateOrUpdate(ctx context.Context, data *product2.Product) error {
+func (g *GormProductRepository) CreateOrUpdate(ctx context.Context, data *product.Product) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	return tx.Save(toDBProduct(data)).Error
 }
 
-func (g *GormProductRepository) Update(ctx context.Context, data *product2.Product) error {
+func (g *GormProductRepository) Update(ctx context.Context, data *product.Product) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	if err := tx.Save(toDBProduct(data)).Error; err != nil {
 		return err
@@ -129,7 +128,7 @@ func (g *GormProductRepository) Update(ctx context.Context, data *product2.Produ
 func (g *GormProductRepository) Delete(ctx context.Context, id uint) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	if err := tx.Where("id = ?", id).Delete(&models.WarehouseProduct{}).Error; err != nil { //nolint:exhaustruct
 		return err

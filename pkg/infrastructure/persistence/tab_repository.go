@@ -8,7 +8,6 @@ import (
 	"github.com/iota-agency/iota-sdk/pkg/graphql/helpers"
 	"github.com/iota-agency/iota-sdk/pkg/infrastructure/persistence/models"
 	"github.com/iota-agency/iota-sdk/pkg/mapping"
-	"github.com/iota-agency/iota-sdk/pkg/service"
 )
 
 type GormTabRepository struct{}
@@ -20,7 +19,7 @@ func NewTabRepository() tab.Repository {
 func (g *GormTabRepository) Count(ctx context.Context) (int64, error) {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return 0, service.ErrNoTx
+		return 0, composables.ErrNoTx
 	}
 	var count int64
 	if err := tx.Model(&models.Tab{}).Count(&count).Error; err != nil { //nolint:exhaustruct
@@ -32,7 +31,7 @@ func (g *GormTabRepository) Count(ctx context.Context) (int64, error) {
 func (g *GormTabRepository) GetAll(ctx context.Context, params *tab.FindParams) ([]*tab.Tab, error) {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return nil, service.ErrNoTx
+		return nil, composables.ErrNoTx
 	}
 	q, err := helpers.ApplySort(tx, params.SortBy)
 	if err != nil {
@@ -48,7 +47,7 @@ func (g *GormTabRepository) GetAll(ctx context.Context, params *tab.FindParams) 
 func (g *GormTabRepository) GetUserTabs(ctx context.Context, userID uint) ([]*tab.Tab, error) {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return nil, service.ErrNoTx
+		return nil, composables.ErrNoTx
 	}
 	var entities []*models.Tab
 	if err := tx.Where("user_id = ?", userID).Find(&entities).Error; err != nil {
@@ -60,7 +59,7 @@ func (g *GormTabRepository) GetUserTabs(ctx context.Context, userID uint) ([]*ta
 func (g *GormTabRepository) GetByID(ctx context.Context, id uint) (*tab.Tab, error) {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return nil, service.ErrNoTx
+		return nil, composables.ErrNoTx
 	}
 	var entity models.Tab
 	if err := tx.Where("id = ?", id).First(&entity).Error; err != nil {
@@ -72,7 +71,7 @@ func (g *GormTabRepository) GetByID(ctx context.Context, id uint) (*tab.Tab, err
 func (g *GormTabRepository) Create(ctx context.Context, data *tab.Tab) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	tab := ToDBTab(data)
 	if err := tx.Create(tab).Error; err != nil {
@@ -81,10 +80,18 @@ func (g *GormTabRepository) Create(ctx context.Context, data *tab.Tab) error {
 	return nil
 }
 
+func (g *GormTabRepository) CreateOrUpdate(ctx context.Context, data *tab.Tab) error {
+	tx, ok := composables.UseTx(ctx)
+	if !ok {
+		return composables.ErrNoTx
+	}
+	return tx.Save(ToDBTab(data)).Error
+}
+
 func (g *GormTabRepository) Update(ctx context.Context, data *tab.Tab) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	tab := ToDBTab(data)
 	if err := tx.Save(tab).Error; err != nil {
@@ -96,7 +103,7 @@ func (g *GormTabRepository) Update(ctx context.Context, data *tab.Tab) error {
 func (g *GormTabRepository) Delete(ctx context.Context, id uint) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	if err := tx.Where("id = ?", id).Delete(&models.Tab{}).Error; err != nil { //nolint:exhaustruct
 		return err
@@ -107,7 +114,7 @@ func (g *GormTabRepository) Delete(ctx context.Context, id uint) error {
 func (g *GormTabRepository) DeleteUserTabs(ctx context.Context, userID uint) error {
 	tx, ok := composables.UseTx(ctx)
 	if !ok {
-		return service.ErrNoTx
+		return composables.ErrNoTx
 	}
 	if err := tx.Where("user_id = ?", userID).Delete(&models.Tab{}).Error; err != nil { //nolint:exhaustruct
 		return err
