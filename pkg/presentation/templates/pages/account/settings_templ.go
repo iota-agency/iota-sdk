@@ -152,7 +152,7 @@ func NavItems(items []types.NavigationItem, tabs []*viewmodels.Tab, depth int, c
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = icons.CaretUp(icons.Props{Size: "16", Class: "duration-200 group-open:rotate-180"}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = icons.ChevronDown(icons.Props{Size: "16", Class: "duration-200 group-open:rotate-180"}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

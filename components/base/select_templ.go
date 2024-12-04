@@ -191,7 +191,7 @@ func (p *SelectProps) render() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = icons.CaretUp(icons.Props{Class: "absolute top-1/2 right-3 -translate-y-1/2 rotate-180 pointer-events-none", Size: "16"}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = icons.ChevronDown(icons.Props{Class: "absolute top-1/2 right-3 -translate-y-1/2 pointer-events-none", Size: "16"}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
