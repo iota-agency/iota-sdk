@@ -51,6 +51,7 @@ jobs:
         run: |
           templ generate
           go vet ./...
+          go test -v ./...
 
       - name: Add generated files to commit
         run: |

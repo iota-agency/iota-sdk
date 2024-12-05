@@ -33,13 +33,14 @@ type WarehouseOrder struct {
 	ID        uint
 	Type      string
 	Status    string
+	Products  []*WarehouseProduct `gorm:"many2many:warehouse_order_items;"`
 	CreatedAt time.Time
 }
 
-type OrderItem struct {
-	OrderID   uint
-	ProductID uint
-	CreatedAt time.Time
+type WarehouseOrderItem struct {
+	WarehouseOrderID uint
+	ProductID        uint
+	CreatedAt        time.Time
 }
 
 type WarehousePosition struct {

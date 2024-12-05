@@ -7,13 +7,8 @@ import (
 
 type Order struct {
 	ID        uint
-	Type      *Type
-	Status    *Status
-	Items     []*Item
-	CreatedAt time.Time
-}
-
-type Item struct {
-	Product   *product.Product
+	Type      Type
+	Status    Status
+	Products  []*product.Product
 	CreatedAt time.Time
 }
