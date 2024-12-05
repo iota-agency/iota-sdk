@@ -89,12 +89,13 @@ func CreateForm(props *CreatePageProps) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = PositionSelect(&PositionSelectProps{
-				PageContext: props.PageContext,
-				Value:       props.Product.PositionID,
-				Attrs: templ.Attributes{
-					"name": "PositionID",
-				},
+			templ_7745c5c3_Err = base.Combobox(base.ComboboxProps{
+				Label:        props.T("Products.Single.Position"),
+				Placeholder:  props.T("Products.Single.SearchPosition"),
+				Searchable:   true,
+				NotFoundText: props.T("Products.Single.NoPositionsFound"),
+				Name:         "PositionID",
+				Endpoint:     "/warehouse/positions/search",
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -138,7 +139,7 @@ func CreateForm(props *CreatePageProps) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("Save"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/products/new.templ`, Line: 57, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/products/new.templ`, Line: 58, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {

@@ -206,7 +206,7 @@ func (p *Props) render() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if p.Addon != nil && p.Addon.Position == AddonRight {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"absolute -translate-x-3 right-3 top-1/2 -translate-y-1/2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"absolute -translate-x-3 right-0 top-1/2 -translate-y-1/2 flex items-center justify-center\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -601,7 +601,7 @@ func passwordLock(p *Props) templ.Component {
 			templ_7745c5c3_Var23 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<label x-data=\"passwordVisibility\" class=\"flex items-center justify-center\"><input type=\"checkbox\" class=\"appearance-none peer password-lock\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<label x-data=\"passwordVisibility\" class=\"flex items-center justify-center mr-3\"><input type=\"checkbox\" class=\"appearance-none peer password-lock\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
