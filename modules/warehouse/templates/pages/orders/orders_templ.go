@@ -155,7 +155,7 @@ func OrdersTable(props *IndexPageProps) templ.Component {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var9 string
-						templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("format('%s')", order.UpdatedAt))
+						templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("format('%s')", order.CreatedAt))
 						if templ_7745c5c3_Err != nil {
 							return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/orders.templ`, Line: 41, Col: 66}
 						}
@@ -230,7 +230,7 @@ func OrdersTable(props *IndexPageProps) templ.Component {
 			Columns: []*base.TableColumn{
 				{Label: props.T("WarehouseOrders.List.Type"), Key: "title"},
 				{Label: props.T("WarehouseOrders.List.Status"), Key: "shortTitle"},
-				{Label: props.T("UpdatedAt"), Key: "updatedAt"},
+				{Label: props.T("CreatedAt"), Key: "updatedAt"},
 				{Label: props.T("Actions"), Class: "w-16"},
 			},
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
@@ -366,7 +366,7 @@ func OrdersContent(props *IndexPageProps) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("WarehouseOrders.List.New"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/orders.templ`, Line: 100, Col: 42}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/orders.templ`, Line: 101, Col: 42}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -375,7 +375,8 @@ func OrdersContent(props *IndexPageProps) templ.Component {
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = button.Primary(button.Props{
-			Size: button.SizeNormal, Href: "/warehouse/orders/new",
+			Size: button.SizeNormal,
+			Href: "/warehouse/orders/new",
 			Icon: icons.PlusCircle(icons.Props{Size: "18"}),
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var16), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
