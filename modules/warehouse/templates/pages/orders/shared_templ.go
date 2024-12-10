@@ -11,7 +11,6 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"github.com/iota-agency/iota-sdk/components/base"
 	"github.com/iota-agency/iota-sdk/pkg/composables"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type TypeSelectProps struct {
@@ -55,7 +54,6 @@ func TypeSelect(props *TypeSelectProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		localizer, _ := composables.UseLocalizer(ctx)
 		templ_7745c5c3_Var2 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
@@ -77,7 +75,7 @@ func TypeSelect(props *TypeSelectProps) templ.Component {
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(t.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 39, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 37, Col: 27}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -88,9 +86,9 @@ func TypeSelect(props *TypeSelectProps) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
-					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: t.Label}))
+					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(composables.MustT(ctx, t.Label))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 40, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 38, Col: 38}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
@@ -108,7 +106,7 @@ func TypeSelect(props *TypeSelectProps) templ.Component {
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(t.Value)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 43, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 41, Col: 27}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -119,9 +117,9 @@ func TypeSelect(props *TypeSelectProps) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var6 string
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: t.Label}))
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(composables.MustT(ctx, t.Label))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 44, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/orders/shared.templ`, Line: 42, Col: 38}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {

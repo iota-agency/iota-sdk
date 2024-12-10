@@ -65,11 +65,13 @@ func EditForm(props *EditPageProps) templ.Component {
 			}
 			ctx = templ.InitializeContext(ctx)
 			templ_7745c5c3_Err = input.Text(&input.Props{
-				Label: props.T("WarehouseUnits.Single.Title"),
+				Label:       props.T("WarehouseUnits.Single.Title.Label"),
+				Placeholder: props.T("WarehouseUnits.Single.Title.Placeholder"),
 				Attrs: templ.Attributes{
-					"value": props.Unit.Title,
-					"name":  "Title",
-					"form":  "save-form",
+					"autofocus": true,
+					"value":     props.Unit.Title,
+					"name":      "Title",
+					"form":      "save-form",
 				},
 			}).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
@@ -80,7 +82,8 @@ func EditForm(props *EditPageProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = input.Text(&input.Props{
-				Label: props.T("WarehouseUnits.Single.ShortTitle"),
+				Label:       props.T("WarehouseUnits.Single.ShortTitle.Label"),
+				Placeholder: props.T("WarehouseUnits.Single.ShortTitle.Placeholder"),
 				Attrs: templ.Attributes{
 					"value": props.Unit.ShortTitle,
 					"name":  "ShortTitle",
@@ -103,7 +106,7 @@ func EditForm(props *EditPageProps) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/warehouse/units/%s", props.Unit.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 48, Col: 65}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 51, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -128,7 +131,7 @@ func EditForm(props *EditPageProps) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("Delete"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 65, Col: 24}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 68, Col: 24}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -156,7 +159,7 @@ func EditForm(props *EditPageProps) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(props.DeleteURL)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 71, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 74, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -181,7 +184,7 @@ func EditForm(props *EditPageProps) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("Save"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 84, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/edit.templ`, Line: 87, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {

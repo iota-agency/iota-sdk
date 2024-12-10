@@ -75,10 +75,12 @@ func CreateForm(props *CreatePageProps) templ.Component {
 			}
 			ctx = templ.InitializeContext(ctx)
 			templ_7745c5c3_Err = input.Text(&input.Props{
-				Label: props.T("WarehouseUnits.Single.Title"),
+				Label:       props.T("WarehouseUnits.Single.Title.Label"),
+				Placeholder: props.T("WarehouseUnits.Single.Title.Placeholder"),
 				Attrs: templ.Attributes{
-					"name":  "Title",
-					"value": props.Unit.Title,
+					"autofocus": true,
+					"name":      "Title",
+					"value":     props.Unit.Title,
 				},
 				Error: props.Errors["Title"],
 			}).Render(ctx, templ_7745c5c3_Buffer)
@@ -90,7 +92,8 @@ func CreateForm(props *CreatePageProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = input.Text(&input.Props{
-				Label: props.T("WarehouseUnits.Single.ShortTitle"),
+				Label:       props.T("WarehouseUnits.Single.ShortTitle.Label"),
+				Placeholder: props.T("WarehouseUnits.Single.ShortTitle.Placeholder"),
 				Attrs: templ.Attributes{
 					"name":  "ShortTitle",
 					"value": props.Unit.ShortTitle,
@@ -125,7 +128,7 @@ func CreateForm(props *CreatePageProps) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("Save"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/new.templ`, Line: 61, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `modules/warehouse/templates/pages/units/new.templ`, Line: 64, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
