@@ -234,10 +234,55 @@ let checkboxes = () => ({
   }
 });
 
+let spotlight = () => ({
+  isOpen: false,
+  highlightedIndex: 0,
+
+  handleShortcut(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+      event.preventDefault();
+      this.open();
+    }
+  },
+
+  open() {
+    this.isOpen = true;
+    this.$nextTick(() => {
+      const input = this.$refs.input;
+      if (input) {
+        setTimeout(() => input.focus(), 50);
+      }
+    });
+  },
+
+  close() {
+    this.isOpen = false;
+    this.highlightedIndex = 0;
+  },
+
+  highlightNext() {
+    const itemsCount = document.getElementById(this.$id('spotlight')).childElementCount
+    this.highlightedIndex = (this.highlightedIndex + 1) % itemsCount;
+  },
+
+  highlightPrevious() {
+    const itemsCount = document.getElementById(this.$id('spotlight')).childElementCount
+    this.highlightedIndex = (this.highlightedIndex - 1 + itemsCount) % itemsCount;
+  },
+
+  goToLink() {
+    const item = document.getElementById(this.$id('spotlight')).children[this.highlightedIndex];
+    if (item) {
+      item.children[0].click();
+    }
+  }
+});
+
 document.addEventListener("alpine:init", () => {
   Alpine.data("relativeformat", relativeFormat);
   Alpine.data("passwordVisibility", passwordVisibility);
   Alpine.data("dialog", dialog);
   Alpine.data("combobox", combobox);
   Alpine.data("checkboxes", checkboxes);
+  Alpine.data("spotlight", spotlight);
 });

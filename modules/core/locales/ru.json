@@ -1,9 +1,16 @@
 {
-  "errors": {
-    "message": "Запрашиваемый ресурс не найден."
-  },
   "Errors": {
     "Internal": "Внутренная серверная ошибка"
+  },
+  "Spotlight": {
+    "Placeholder": "Поиск...",
+    "NothingFound": "Ничего не найдено",
+    "Actions": {
+      "AddUser": "Добавить пользователя",
+      "AddExpense": "Добавить расход",
+      "AddPayment": "Добавить платеж",
+      "AddAccount": "Добавить счет"
+    }
   },
   "ErrorPages": {
     "NotFound": {

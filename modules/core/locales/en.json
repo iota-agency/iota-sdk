@@ -1,9 +1,16 @@
 {
-  "errors": {
-    "message": "The requested resource could not be found."
-  },
   "Errors": {
     "Internal": "Internal server error"
+  },
+  "Spotlight": {
+    "Placeholder": "Search...",
+    "NothingFound": "Nothing found",
+    "Actions": {
+      "AddUser": "Add user",
+      "AddExpense": "Add expense",
+      "AddPayment": "Add payment",
+      "AddAccount": "Add account"
+    }
   },
   "ErrorPages": {
     "NotFound": {

@@ -36,8 +36,7 @@ func TestGormPositionRepository_CRUD(t *testing.T) { //nolint:paralleltest
 		ctx.Context, &upload.Upload{
 			ID:        1,
 			Hash:      "hash",
-			URL:       "url",
-			Name:      "name",
+			Path:      "url",
 			Size:      1,
 			Mimetype:  *mimetype.Lookup("image/png"),
 			CreatedAt: time.Now(),

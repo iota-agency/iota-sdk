@@ -1,4 +1,7 @@
 {
+  "Errors": {
+    "ERR_INVALID_CELL": "Ошибка при обработке ячейки \"{{.Col}}:{{.Row}}\""
+  },
   "NavigationLinks": {
     "Warehouse": "Склад",
     "Products": "Продукты",
@@ -47,6 +50,7 @@
         "Title": "Наименования"
       },
       "New": "Новое наименование",
+      "Upload": "Загрузить .xlsx",
       "Position": "Наименование",
       "Barcode": "Артикул",
       "Unit": "Единица измерения"
@@ -63,13 +67,36 @@
     },
     "Single": {
       "Images": "Изображения",
-      "Title": "Название",
-      "Barcode": "Артикул",
+      "Title": {
+        "Label": "Наименование",
+        "Placeholder": "пр.: Блок питания"
+      },
+      "Barcode": {
+        "Label": "Артикул",
+        "Placeholder": "пр.: 123456"
+      },
       "Unit": "Единица",
       "SelectUnit": "Выбрать единицу",
       "Delete": "Удалить",
       "DeleteConfirmation": "Вы уверены, что хотите удалить это наименование?",
       "NothingFound": "Ничего не найдено"
+    },
+    "Upload": {
+      "Meta": {
+        "Title": "Загрузить .xlsx"
+      },
+      "Example": {
+        "Title": "Загрузка Excel",
+        "Description": "Последовательность ячеек в Excel должна быть следующая:",
+        "ItemName": "Наименование",
+        "ItemCode": "Артикул",
+        "Unit": "Ед. измерения",
+        "Quantity": "Кол-во",
+        "Below": "Ниже приведен пример файла Excel для загрузки"
+      },
+      "UploadLabel": "Выбрать файл",
+      "UploadPlaceholder": "Выберите файл",
+      "Submit": "Загрузить"
     }
   },
   "WarehouseUnits": {
@@ -92,8 +119,14 @@
       }
     },
     "Single": {
-      "Title": "Название",
-      "ShortTitle": "Краткое название",
+      "Title": {
+        "Label": "Название",
+        "Placeholder": "пр.: Килограмм"
+      },
+      "ShortTitle": {
+        "Label": "Краткое название",
+        "Placeholder": "пр.: кг"
+      },
       "Delete": "Удалить",
       "DeleteConfirmation": "Вы уверены, что хотите удалить эту единицу изменерения?"
     }
