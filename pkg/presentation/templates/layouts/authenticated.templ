@@ -42,7 +42,11 @@ func newSidebarLink(name, href string, icon templ.Component, active bool) sideba
 }
 
 templ (l sidebarLink) render() {
-	@button.Sidebar(button.Props{Size: button.SizeMD, Href: l.href, Class: l.class}) {
+	@button.Sidebar(button.Props{
+		Size:  button.SizeMD,
+		Href:  l.href,
+		Class: l.class,
+	}) {
 		if l.icon != nil {
 			@l.icon
 		}
@@ -103,7 +107,9 @@ templ sidebar(pageCtx *types.PageContext) {
 			</a>
 		</div>
 		<nav class="py-4 flex-1">
-			<ul class="flex flex-col gap-2 overflow-y-auto h-[calc(100vh-12rem)] px-6 hide-scrollbar">
+			<ul
+				class="flex flex-col gap-2 overflow-y-auto h-[calc(100vh-12rem)] px-6 hide-scrollbar"
+			>
 				for _, item := range pageCtx.NavItems {
 					@renderNavItem(item, pageCtx.Pathname)
 				}
@@ -121,7 +127,7 @@ templ sidebar(pageCtx *types.PageContext) {
 templ avatar() {
 	{{ u := mappers.UserToViewModel(composables.MustUseUser(ctx)) }}
 	<summary class="w-9 h-9 rounded-full font-medium flex items-center justify-center cursor-pointer bg-avatar text-avatar">
-		if u.Avatar != nil {
+		if u.Avatar.URL != "/" {
 			<img src={ u.Avatar.URL } alt="Avatar" class="w-9 h-9 rounded-full"/>
 		} else {
 			{ u.Initials() }
@@ -187,7 +193,7 @@ templ Navbar(pageCtx *types.PageContext) {
 }
 
 templ Authenticated(pageCtx *types.PageContext) {
-	@Base(pageCtx) {
+	@Base(pageCtx.Title) {
 		<div class="grid min-h-screen w-full grid-cols-[280px_1fr]">
 			@sidebar(pageCtx)
 			<div>

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/iota-agency/iota-sdk/modules/warehouse/controllers/dtos"
 	"github.com/iota-agency/iota-sdk/modules/warehouse/services/position_service"
+	"github.com/iota-agency/iota-sdk/pkg/middleware"
 	"github.com/iota-agency/iota-sdk/pkg/serrors"
 	"net/http"
 
@@ -21,7 +22,6 @@ import (
 	"github.com/iota-agency/iota-sdk/pkg/composables"
 	"github.com/iota-agency/iota-sdk/pkg/mapping"
 	"github.com/iota-agency/iota-sdk/pkg/shared"
-	"github.com/iota-agency/iota-sdk/pkg/shared/middleware"
 	"github.com/iota-agency/iota-sdk/pkg/types"
 )
 
@@ -48,11 +48,21 @@ func NewPositionsController(app application.Application) application.Controller 
 
 func (c *PositionsController) Register(r *mux.Router) {
 	router := r.PathPrefix(c.basePath).Subrouter()
-	router.Use(middleware.RequireAuthorization())
+	router.Use(
+		middleware.WithTransaction(),
+		middleware.Authorize(),
+		middleware.RequireAuthorization(),
+		middleware.ProvideUser(),
+		middleware.Tabs(),
+		middleware.WithLocalizer(c.app.Bundle()),
+		middleware.NavItems(c.app),
+	)
+
 	router.HandleFunc("", c.List).Methods(http.MethodGet)
 	router.HandleFunc("", c.Create).Methods(http.MethodPost)
 	router.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)
 	router.HandleFunc("/{id:[0-9]+}", c.PostEdit).Methods(http.MethodPost)
+	router.HandleFunc("/{id:[0-9]+}", c.Delete).Methods(http.MethodDelete)
 	router.HandleFunc("/search", c.Search).Methods(http.MethodGet)
 	router.HandleFunc("/new", c.GetNew).Methods(http.MethodGet)
 	router.HandleFunc("/upload", c.GetUpload).Methods(http.MethodGet)
@@ -350,5 +360,18 @@ func (c *PositionsController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	shared.Redirect(w, r, c.basePath)
+}
+
+func (c *PositionsController) Delete(w http.ResponseWriter, r *http.Request) {
+	id, err := shared.ParseID(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if _, err := c.positionService.Delete(r.Context(), id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	shared.Redirect(w, r, c.basePath)
 }

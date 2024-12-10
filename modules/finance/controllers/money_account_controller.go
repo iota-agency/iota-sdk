@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/iota-agency/iota-sdk/pkg/middleware"
 	"net/http"
 
 	"github.com/go-faster/errors"
@@ -14,7 +15,6 @@ import (
 	coremappers "github.com/iota-agency/iota-sdk/pkg/presentation/mappers"
 	coreservices "github.com/iota-agency/iota-sdk/pkg/services"
 	"github.com/iota-agency/iota-sdk/pkg/shared"
-	"github.com/iota-agency/iota-sdk/pkg/shared/middleware"
 	"github.com/iota-agency/iota-sdk/pkg/types"
 
 	"github.com/a-h/templ"
@@ -46,7 +46,15 @@ func NewMoneyAccountController(app application.Application) application.Controll
 
 func (c *MoneyAccountController) Register(r *mux.Router) {
 	router := r.PathPrefix(c.basePath).Subrouter()
-	router.Use(middleware.RequireAuthorization())
+	router.Use(
+		middleware.WithTransaction(),
+		middleware.Authorize(),
+		middleware.RequireAuthorization(),
+		middleware.ProvideUser(),
+		middleware.Tabs(),
+		middleware.WithLocalizer(c.app.Bundle()),
+		middleware.NavItems(c.app),
+	)
 	router.HandleFunc("", c.List).Methods(http.MethodGet)
 	router.HandleFunc("", c.Create).Methods(http.MethodPost)
 	router.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)

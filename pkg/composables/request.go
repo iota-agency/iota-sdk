@@ -5,12 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"github.com/iota-agency/iota-sdk/pkg/application"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
 	"time"
 
-	"github.com/iota-agency/iota-sdk/pkg/configuration"
 	"github.com/iota-agency/iota-sdk/pkg/constants"
 	"github.com/iota-agency/iota-sdk/pkg/types"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -28,7 +27,6 @@ type Params struct {
 	Authenticated bool
 	Request       *http.Request
 	Writer        http.ResponseWriter
-	Meta          map[string]interface{}
 }
 
 // UseParams returns the request parameters from the context.
@@ -41,6 +39,16 @@ func UseParams(ctx context.Context) (*Params, bool) {
 // WithParams returns a new context with the request parameters.
 func WithParams(ctx context.Context, params *Params) context.Context {
 	return context.WithValue(ctx, constants.ParamsKey, params)
+}
+
+// UseApp returns the user from the context.
+// If the user is not found, the second return value will be false.
+func UseApp(ctx context.Context) (application.Application, error) {
+	app := ctx.Value(constants.AppKey)
+	if app == nil {
+		return nil, ErrAppNotFound
+	}
+	return app.(application.Application), nil
 }
 
 // UseRequest returns the request from the context.
@@ -61,16 +69,6 @@ func UseLogger(ctx context.Context) (*logrus.Entry, error) {
 		return nil, ErrNoLogger
 	}
 	return logger.(*logrus.Entry), nil
-}
-
-// UseMeta returns the metadata from the context.
-// If the metadata is not found, the second return value will be false.
-func UseMeta(ctx context.Context) (map[string]interface{}, bool) {
-	params, ok := UseParams(ctx)
-	if !ok {
-		return nil, false
-	}
-	return params.Meta, true
 }
 
 // UseAuthenticated returns whether the user is authenticated and the second return value is true.
@@ -101,16 +99,6 @@ func UseUserAgent(ctx context.Context) (string, bool) {
 		return "", false
 	}
 	return params.UserAgent, true
-}
-
-// UseWriter returns the response writer from the context.
-// If the response writer is not found, the second return value will be false.
-func UseWriter(ctx context.Context) (http.ResponseWriter, bool) {
-	params, ok := UseParams(ctx)
-	if !ok {
-		return nil, false
-	}
-	return params.Writer, true
 }
 
 func useLocaleFromUser(ctx context.Context) (language.Tag, error) {
@@ -147,36 +135,14 @@ func UseLocale(ctx context.Context, defaultLocale language.Tag) language.Tag {
 	return tags[0]
 }
 
-type PaginationParams struct {
-	Limit  int
-	Offset int
-	Page   int
-}
-
-func UsePaginated(r *http.Request) PaginationParams {
-	config := configuration.Use()
-	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err != nil || limit > config.MaxPageSize {
-		limit = config.PageSize
-	}
-
-	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
-
-	return PaginationParams{
-		Limit:  limit,
-		Offset: page * limit,
-		Page:   page,
-	}
-}
-
 func UsePageCtx(r *http.Request, pageData *types.PageData) (*types.PageContext, error) {
 	localizer, found := UseLocalizer(r.Context())
 	if !found {
 		return nil, ErrNoLocalizer
 	}
-	uniTranslator, found := UseUniLocalizer(r.Context())
-	if !found {
-		return nil, ErrNoLocalizer
+	uniTranslator, err := UseUniLocalizer(r.Context())
+	if err != nil {
+		return nil, err
 	}
 	locale := UseLocale(r.Context(), language.English)
 	navItems, _ := UseNavItems(r)

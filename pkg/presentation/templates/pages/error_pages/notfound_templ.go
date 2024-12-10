@@ -9,6 +9,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+<<<<<<< HEAD
 	"github.com/iota-agency/iota-sdk/pkg/presentation/templates/layouts"
 	"github.com/iota-agency/iota-sdk/pkg/types"
 )
@@ -18,6 +19,14 @@ type NotFoundPageProps struct {
 }
 
 func NotFoundContent(props *NotFoundPageProps) templ.Component {
+=======
+	"github.com/iota-agency/iota-sdk/components/base/button"
+	"github.com/iota-agency/iota-sdk/pkg/composables"
+	"github.com/iota-agency/iota-sdk/pkg/presentation/templates/layouts"
+)
+
+func NotFoundContent() templ.Component {
+>>>>>>> main
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -50,26 +59,79 @@ func NotFoundContent(props *NotFoundPageProps) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
+<<<<<<< HEAD
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center justify-center h-full\"><div class=\"flex flex-col items-center\"><img src=\"/assets/images/search.svg\" class=\"w-32 h-32\" alt=\"404\"><h1 class=\"text-2xl font-bold text-primary\">404</h1><h2 class=\"text-lg font-bold text-primary\">")
+=======
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex flex-col items-center justify-center h-screen w-full\"><div class=\"flex flex-col items-center\"><img src=\"/assets/images/search.svg\" class=\"w-32 h-32\" alt=\"404\"><h1 class=\"text-2xl font-bold text-primary\">404</h1><h2 class=\"text-lg font-bold text-primary\">")
+>>>>>>> main
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
+<<<<<<< HEAD
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("ErrorPages.NotFound.Message"))
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/error_pages/notfound.templ`, Line: 19, Col: 45}
+=======
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(composables.MustT(ctx, "ErrorPages.NotFound.Message"))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/error_pages/notfound.templ`, Line: 16, Col: 60}
+>>>>>>> main
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+<<<<<<< HEAD
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><p class=\"text-lg text-gray-500 mt-4\"></p></div></div>")
+=======
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h2><div class=\"mt-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+				templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+				templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+				if !templ_7745c5c3_IsBuffer {
+					defer func() {
+						templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+						if templ_7745c5c3_Err == nil {
+							templ_7745c5c3_Err = templ_7745c5c3_BufErr
+						}
+					}()
+				}
+				ctx = templ.InitializeContext(ctx)
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(composables.MustT(ctx, "ErrorPages.NotFound.Home"))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/error_pages/notfound.templ`, Line: 24, Col: 58}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				return templ_7745c5c3_Err
+			})
+			templ_7745c5c3_Err = button.Primary(button.Props{
+				Attrs: templ.Attributes{
+					"type": "submit",
+				}},
+			).Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><p class=\"text-lg text-gray-500 mt-4\"></p></div></div>")
+>>>>>>> main
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return templ_7745c5c3_Err
 		})
+<<<<<<< HEAD
 		templ_7745c5c3_Err = layouts.Authenticated(props.PageContext).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+=======
+		templ_7745c5c3_Err = layouts.Base("Not found").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+>>>>>>> main
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

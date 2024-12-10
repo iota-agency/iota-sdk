@@ -13,9 +13,12 @@ const (
 	TxKey          ContextKey = "tx"
 	ParamsKey      ContextKey = "params"
 	LoggerKey      ContextKey = "logger"
+	AppKey         ContextKey = "app"
 	LogoKey        ContextKey = "logo"
 	HeadKey        ContextKey = "head"
 	TabsKey        ContextKey = "tabs"
+	RequestStart   ContextKey = "requestStart"
+	LocalizerKey   ContextKey = "localizer"
 )
 
 var Validate = validator.New(validator.WithRequiredStructEnabled())

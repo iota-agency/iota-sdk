@@ -1,20 +1,19 @@
 package controllers
 
 import (
+	"github.com/a-h/templ"
+	"github.com/gorilla/mux"
 	"github.com/iota-agency/iota-sdk/components/spotlight"
+	"github.com/iota-agency/iota-sdk/pkg/application"
 	"github.com/iota-agency/iota-sdk/pkg/composables"
+	"github.com/iota-agency/iota-sdk/pkg/middleware"
 	"github.com/iota-agency/iota-sdk/pkg/presentation/templates/icons"
+	"github.com/iota-agency/iota-sdk/pkg/services"
 	"github.com/iota-agency/iota-sdk/pkg/types"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"net/http"
 	"sort"
-
-	"github.com/a-h/templ"
-	"github.com/gorilla/mux"
-	"github.com/iota-agency/iota-sdk/pkg/application"
-	"github.com/iota-agency/iota-sdk/pkg/services"
-	"github.com/iota-agency/iota-sdk/pkg/shared/middleware"
 )
 
 func flatNavItems(items []types.NavigationItem) []types.NavigationItem {
@@ -36,24 +35,27 @@ func flatNavItems(items []types.NavigationItem) []types.NavigationItem {
 }
 
 type SpotlightController struct {
-	app         application.Application
-	userService *services.UserService
-	tabService  *services.TabService
-	basePath    string
+	app        application.Application
+	tabService *services.TabService
+	basePath   string
 }
 
 func NewSpotlightController(app application.Application) application.Controller {
 	return &SpotlightController{
-		app:         app,
-		userService: app.Service(services.UserService{}).(*services.UserService),
-		tabService:  app.Service(services.TabService{}).(*services.TabService),
-		basePath:    "/spotlight",
+		app:        app,
+		tabService: app.Service(services.TabService{}).(*services.TabService),
+		basePath:   "/spotlight",
 	}
 }
 
 func (c *SpotlightController) Register(r *mux.Router) {
 	router := r.PathPrefix(c.basePath).Subrouter()
-	router.Use(middleware.RequireAuthorization())
+	router.Use(
+		middleware.Authorize(),
+		middleware.ProvideUser(),
+		middleware.RequireAuthorization(),
+		middleware.WithLocalizer(c.app.Bundle()),
+	)
 	router.HandleFunc("/search", c.Get).Methods(http.MethodGet)
 }
 
@@ -104,7 +106,7 @@ func (c *SpotlightController) spotlightItems(localizer *i18n.Localizer) []*spotl
 func (c *SpotlightController) Get(w http.ResponseWriter, r *http.Request) {
 	localizer, ok := composables.UseLocalizer(r.Context())
 	if !ok {
-		http.Error(w, "no localizer", http.StatusInternalServerError)
+		http.Error(w, composables.ErrNoLocalizer.Error(), http.StatusInternalServerError)
 		return
 	}
 	q := r.URL.Query().Get("q")
