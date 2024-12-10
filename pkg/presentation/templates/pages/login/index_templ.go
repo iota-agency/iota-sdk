@@ -162,11 +162,7 @@ func Index(p *LoginProps) templ.Component {
 			}
 			return templ_7745c5c3_Err
 		})
-<<<<<<< HEAD
-		templ_7745c5c3_Err = layouts.Base(p.PageContext).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
-=======
 		templ_7745c5c3_Err = layouts.Base(p.Title).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
->>>>>>> main
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

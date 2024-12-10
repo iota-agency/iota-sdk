@@ -310,20 +310,12 @@ func Edit(props *EditPageProps) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = dialog.Confirmation(&dialog.Props{
-<<<<<<< HEAD
-				Heading:   "Products.Single.Delete",
-				Text:      "Products.Single.DeleteConfirmation",
-				Localizer: props.Localizer,
-				Icon:      icons.Trash(icons.Props{Size: "20"}),
-				Action:    "open-delete-product-confirmation",
-=======
 				CancelText:  props.T("Cancel"),
 				ConfirmText: props.T("Delete"),
 				Heading:     props.T("Products.Single.Delete"),
 				Text:        props.T("Products.Single.DeleteConfirmation"),
 				Icon:        icons.Trash(icons.Props{Size: "20"}),
 				Action:      "open-delete-product-confirmation",
->>>>>>> main
 				Attrs: templ.Attributes{
 					"@closing": `({target}) => {
      if (target.returnValue === "confirm") {

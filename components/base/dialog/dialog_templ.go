@@ -12,18 +12,6 @@ import (
 	"fmt"
 	"github.com/iota-agency/iota-sdk/components/base/button"
 	"github.com/iota-agency/iota-sdk/pkg/presentation/templates/icons"
-<<<<<<< HEAD
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-)
-
-type Props struct {
-	Icon      templ.Component
-	Heading   string
-	Text      string
-	Localizer *i18n.Localizer
-	Action    string
-	Attrs     templ.Attributes
-=======
 )
 
 type Props struct {
@@ -34,7 +22,6 @@ type Props struct {
 	Attrs       templ.Attributes
 	CancelText  string
 	ConfirmText string
->>>>>>> main
 }
 
 func Confirmation(p *Props) templ.Component {
@@ -79,15 +66,9 @@ func Confirmation(p *Props) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
-<<<<<<< HEAD
-		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(p.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: p.Heading}))
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 24, Col: 99}
-=======
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(p.Heading)
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 24, Col: 40}
->>>>>>> main
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -143,15 +124,9 @@ func Confirmation(p *Props) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-<<<<<<< HEAD
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: p.Text}))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 37, Col: 74}
-=======
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(p.Text)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 37, Col: 15}
->>>>>>> main
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -183,15 +158,9 @@ func Confirmation(p *Props) templ.Component {
 			}
 			ctx = templ.InitializeContext(ctx)
 			var templ_7745c5c3_Var6 string
-<<<<<<< HEAD
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: "Cancel"}))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 45, Col: 76}
-=======
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(p.CancelText)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 45, Col: 21}
->>>>>>> main
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -216,15 +185,9 @@ func Confirmation(p *Props) templ.Component {
 			}
 			ctx = templ.InitializeContext(ctx)
 			var templ_7745c5c3_Var8 string
-<<<<<<< HEAD
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.Localizer.MustLocalize(&i18n.LocalizeConfig{MessageID: "Delete"}))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 48, Col: 76}
-=======
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.ConfirmText)
 			if templ_7745c5c3_Err != nil {
 				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/dialog/dialog.templ`, Line: 48, Col: 22}
->>>>>>> main
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
