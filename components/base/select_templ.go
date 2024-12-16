@@ -121,7 +121,7 @@ func (p *SelectProps) render() templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		var templ_7745c5c3_Var6 = []any{"min-w-20 w-full appearance-none form-control h-[2.6875rem] pr-8", templ.KV("rounded-l-none", p.Prefix != ""), p.Class}
+		var templ_7745c5c3_Var6 = []any{"min-w-20 w-full appearance-none form-control form-control-input h-[2.6875rem] pr-8", templ.KV("rounded-l-none", p.Prefix != ""), p.Class}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -146,7 +146,7 @@ func (p *SelectProps) render() templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(p.id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/select.templ`, Line: 38, Col: 149}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/base/select.templ`, Line: 38, Col: 168}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {

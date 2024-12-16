@@ -293,8 +293,7 @@ func EmployeesContent(props *IndexPageProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = input.Text(&input.Props{
-			Addon: &input.Addon{
-				Position:  input.AddonLeft,
+			AddonLeft: &input.Addon{
 				Component: icons.MagnifyingGlass(icons.Props{Size: "20"}),
 			},
 			Placeholder: props.T("Search"),
@@ -369,7 +368,7 @@ func EmployeesContent(props *IndexPageProps) templ.Component {
 			var templ_7745c5c3_Var18 string
 			templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("Employees.List.New"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/employees/employees.templ`, Line: 101, Col: 36}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/employees/employees.templ`, Line: 100, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 			if templ_7745c5c3_Err != nil {

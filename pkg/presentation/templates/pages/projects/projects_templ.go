@@ -280,8 +280,7 @@ func ProjectsContent(props *IndexPageProps) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = input.Text(&input.Props{
-			Addon: &input.Addon{
-				Position:  input.AddonLeft,
+			AddonLeft: &input.Addon{
 				Component: icons.MagnifyingGlass(icons.Props{Size: "20"}),
 			},
 			Placeholder: props.T("Search"),
@@ -356,7 +355,7 @@ func ProjectsContent(props *IndexPageProps) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(props.T("Projects.List.New"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/projects/projects.templ`, Line: 100, Col: 35}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `pkg/presentation/templates/pages/projects/projects.templ`, Line: 99, Col: 35}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
