@@ -47,26 +47,31 @@ func NewPositionsController(app application.Application) application.Controller 
 }
 
 func (c *PositionsController) Register(r *mux.Router) {
-	router := r.PathPrefix(c.basePath).Subrouter()
-	router.Use(
-		middleware.WithTransaction(),
+	commonMiddleware := []mux.MiddlewareFunc{
 		middleware.Authorize(),
 		middleware.RequireAuthorization(),
 		middleware.ProvideUser(),
 		middleware.Tabs(),
 		middleware.WithLocalizer(c.app.Bundle()),
 		middleware.NavItems(c.app),
-	)
+	}
+	getRouter := r.PathPrefix(c.basePath).Subrouter()
+	getRouter.Use(commonMiddleware...)
 
-	router.HandleFunc("", c.List).Methods(http.MethodGet)
-	router.HandleFunc("", c.Create).Methods(http.MethodPost)
-	router.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)
-	router.HandleFunc("/{id:[0-9]+}", c.PostEdit).Methods(http.MethodPost)
-	router.HandleFunc("/{id:[0-9]+}", c.Delete).Methods(http.MethodDelete)
-	router.HandleFunc("/search", c.Search).Methods(http.MethodGet)
-	router.HandleFunc("/new", c.GetNew).Methods(http.MethodGet)
-	router.HandleFunc("/upload", c.GetUpload).Methods(http.MethodGet)
-	router.HandleFunc("/upload", c.HandleUpload).Methods(http.MethodPost)
+	getRouter.HandleFunc("", c.List).Methods(http.MethodGet)
+	getRouter.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)
+	getRouter.HandleFunc("/search", c.Search).Methods(http.MethodGet)
+	getRouter.HandleFunc("/new", c.GetNew).Methods(http.MethodGet)
+	getRouter.HandleFunc("/upload", c.GetUpload).Methods(http.MethodGet)
+
+	setRouter := r.PathPrefix(c.basePath).Subrouter()
+	setRouter.Use(commonMiddleware...)
+	setRouter.Use(middleware.WithTransaction())
+
+	setRouter.HandleFunc("", c.Create).Methods(http.MethodPost)
+	setRouter.HandleFunc("/{id:[0-9]+}", c.PostEdit).Methods(http.MethodPost)
+	setRouter.HandleFunc("/{id:[0-9]+}", c.Delete).Methods(http.MethodDelete)
+	setRouter.HandleFunc("/upload", c.HandleUpload).Methods(http.MethodPost)
 }
 
 func (c *PositionsController) GetUpload(w http.ResponseWriter, r *http.Request) {
@@ -129,12 +134,16 @@ func (c *PositionsController) HandleUpload(w http.ResponseWriter, r *http.Reques
 }
 
 func (c *PositionsController) viewModelPositions(r *http.Request) (*PositionPaginatedResponse, error) {
-	params := composables.UsePaginated(r)
-	entities, err := c.positionService.GetPaginated(r.Context(), &position.FindParams{
-		Limit:  params.Limit,
-		Offset: params.Offset,
+	paginationParams := composables.UsePaginated(r)
+	params, err := composables.UseQuery(&position.FindParams{
+		Limit:  paginationParams.Limit,
+		Offset: paginationParams.Offset,
 		SortBy: []string{"created_at desc"},
-	})
+	}, r)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error retrieving query")
+	}
+	entities, err := c.positionService.GetPaginated(r.Context(), params)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error retrieving positions")
 	}
@@ -143,7 +152,7 @@ func (c *PositionsController) viewModelPositions(r *http.Request) (*PositionPagi
 		return nil, errors.Wrap(err, "Error counting positions")
 	}
 	return &PositionPaginatedResponse{
-		PaginationState: pagination.New(c.basePath, params.Page, int(total), params.Limit),
+		PaginationState: pagination.New(c.basePath, paginationParams.Page, int(total), params.Limit),
 		Positions:       mapping.MapViewModels(entities, mappers.PositionToViewModel),
 	}, nil
 }
@@ -171,10 +180,17 @@ func (c *PositionsController) List(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	unitViewModels, err := c.viewModelUnits(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	isHxRequest := len(r.Header.Get("Hx-Request")) > 0
 	props := &positions.IndexPageProps{
 		PageContext:     pageCtx,
 		Positions:       paginated.Positions,
+		Units:           unitViewModels,
 		PaginationState: paginated.PaginationState,
 	}
 	if isHxRequest {
@@ -224,8 +240,9 @@ func (c *PositionsController) GetEdit(w http.ResponseWriter, r *http.Request) {
 func (c *PositionsController) Search(w http.ResponseWriter, r *http.Request) {
 	search := r.URL.Query().Get("q")
 	entities, err := c.positionService.GetPaginated(r.Context(), &position.FindParams{
-		Search: search,
-		Limit:  10,
+		Query: search,
+		Field: "name",
+		Limit: 10,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

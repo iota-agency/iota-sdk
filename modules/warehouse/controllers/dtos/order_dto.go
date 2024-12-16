@@ -1,91 +1,81 @@
 package dtos
 
 import (
-	ut "github.com/go-playground/universal-translator"
+	"context"
+	"fmt"
 	"github.com/go-playground/validator/v10"
-	"github.com/iota-agency/iota-sdk/modules/warehouse/domain/aggregates/order"
-	"github.com/iota-agency/iota-sdk/modules/warehouse/domain/aggregates/product"
+	"github.com/iota-agency/iota-sdk/pkg/composables"
 	"github.com/iota-agency/iota-sdk/pkg/constants"
-	"time"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type CreateOrderDTO struct {
-	Type       string `validate:"required"`
-	Status     string `validate:"required"`
-	ProductIDs []uint `validate:"required"`
+	PositionIDs []uint        `validate:"required"`
+	Quantity    map[uint]uint `validate:"required"`
 }
 
 type UpdateOrderDTO struct {
-	Type       string
-	Status     string
-	ProductIDs []uint
+	PositionIDs []uint
+	Quantities  map[uint]uint
 }
 
-func (d *CreateOrderDTO) Ok(l ut.Translator) (map[string]string, bool) {
+func (d *CreateOrderDTO) Ok(ctx context.Context) (map[string]string, bool) {
+	l, ok := composables.UseLocalizer(ctx)
+	if !ok {
+		panic(composables.ErrNoLocalizer)
+	}
 	errorMessages := map[string]string{}
 	errs := constants.Validate.Struct(d)
 	if errs == nil {
 		return errorMessages, true
 	}
-
 	for _, err := range errs.(validator.ValidationErrors) {
-		errorMessages[err.Field()] = err.Translate(l)
+		if err.Tag() == "required" && err.Field() == "PositionIDs" {
+			translatedField := l.MustLocalize(&i18n.LocalizeConfig{
+				MessageID: "WarehouseOrders.Single.PositionIDs",
+			})
+			errorMessages[err.Field()] = l.MustLocalize(&i18n.LocalizeConfig{
+				MessageID: "ValidationErrors.emptySelect",
+				TemplateData: map[string]string{
+					"Field": translatedField,
+				},
+			})
+			continue
+		}
+		translatedField := l.MustLocalize(&i18n.LocalizeConfig{
+			MessageID: fmt.Sprintf("WarehouseOrders.Single.%s", err.Field()),
+		})
+
+		errorMessages[err.Field()] = l.MustLocalize(&i18n.LocalizeConfig{
+			MessageID: fmt.Sprintf("ValidationErrors.%s", err.Tag()),
+			TemplateData: map[string]string{
+				"Field": translatedField,
+			},
+		})
 	}
 	return errorMessages, len(errorMessages) == 0
 }
 
-func (d *UpdateOrderDTO) Ok(l ut.Translator) (map[string]string, bool) {
-	errors := map[string]string{}
+func (d *UpdateOrderDTO) Ok(ctx context.Context) (map[string]string, bool) {
+	l, ok := composables.UseLocalizer(ctx)
+	if ok {
+		panic(composables.ErrNoLocalizer)
+	}
+	errorMessages := map[string]string{}
 	errs := constants.Validate.Struct(d)
 	if errs == nil {
-		return errors, true
+		return errorMessages, true
 	}
 	for _, err := range errs.(validator.ValidationErrors) {
-		errors[err.Field()] = err.Translate(l)
+		translatedFieldName := l.MustLocalize(&i18n.LocalizeConfig{
+			MessageID: fmt.Sprintf("WarehouseOrders.Single.%s", err.Field()),
+		})
+		errorMessages[err.Field()] = l.MustLocalize(&i18n.LocalizeConfig{
+			MessageID: fmt.Sprintf("ValidationErrors.%s", err.Tag()),
+			TemplateData: map[string]string{
+				"Field": translatedFieldName,
+			},
+		})
 	}
-	return errors, len(errors) == 0
-}
-
-func (d *CreateOrderDTO) ToEntity() (*order.Order, error) {
-	t, err := order.NewType(d.Type)
-	if err != nil {
-		return nil, err
-	}
-	s, err := order.NewStatus(d.Status)
-	if err != nil {
-		return nil, err
-	}
-	var products []*product.Product
-	for _, id := range d.ProductIDs {
-		products = append(products, &product.Product{ID: id})
-	}
-	return &order.Order{
-		ID:        0,
-		Type:      t,
-		Status:    s,
-		Products:  products,
-		CreatedAt: time.Now(),
-	}, nil
-}
-
-func (d *UpdateOrderDTO) ToEntity(id uint) (*order.Order, error) {
-	t, err := order.NewType(d.Type)
-	if err != nil {
-		return nil, err
-	}
-	s, err := order.NewStatus(d.Status)
-	if err != nil {
-		return nil, err
-	}
-	var products []*product.Product
-	for _, id := range d.ProductIDs {
-		products = append(products, &product.Product{ID: id})
-	}
-	return &order.Order{
-		ID:        id,
-		Type:      t,
-		Status:    s,
-		Products:  products,
-		CreatedAt: time.Now(),
-	}, nil
+	return errorMessages, len(errorMessages) == 0
 }

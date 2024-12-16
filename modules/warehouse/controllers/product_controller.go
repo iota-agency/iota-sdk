@@ -1,11 +1,14 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/iota-agency/iota-sdk/modules/warehouse/services/position_service"
 	"github.com/iota-agency/iota-sdk/modules/warehouse/services/product_service"
 	"github.com/iota-agency/iota-sdk/pkg/middleware"
-	"net/http"
+	"github.com/iota-agency/iota-sdk/pkg/serrors"
 
 	"github.com/a-h/templ"
 	"github.com/gorilla/mux"
@@ -44,32 +47,26 @@ func NewProductsController(app application.Application) application.Controller {
 }
 
 func (c *ProductsController) Register(r *mux.Router) {
-	router := r.PathPrefix(c.basePath).Subrouter()
-	router.Use(
-		middleware.WithTransaction(),
+	commonMiddleware := []mux.MiddlewareFunc{
 		middleware.Authorize(),
 		middleware.RequireAuthorization(),
 		middleware.ProvideUser(),
 		middleware.Tabs(),
 		middleware.WithLocalizer(c.app.Bundle()),
 		middleware.NavItems(c.app),
-	)
-
-	routes := []struct {
-		Path    string
-		Method  string
-		Handler func(http.ResponseWriter, *http.Request)
-	}{
-		{"", http.MethodGet, c.List},
-		{"", http.MethodPost, c.Create},
-		{"/{id:[0-9]+}", http.MethodGet, c.GetEdit},
-		{"/{id:[0-9]+}", http.MethodPost, c.PostEdit},
-		{"/new", http.MethodGet, c.GetNew},
 	}
 
-	for _, route := range routes {
-		router.HandleFunc(route.Path, route.Handler).Methods(route.Method)
-	}
+	getRouter := r.PathPrefix(c.basePath).Subrouter()
+	getRouter.Use(commonMiddleware...)
+	getRouter.HandleFunc("", c.List).Methods(http.MethodGet)
+	getRouter.HandleFunc("/new", c.GetNew).Methods(http.MethodGet)
+	getRouter.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)
+
+	setRouter := r.PathPrefix(c.basePath).Subrouter()
+	setRouter.Use(commonMiddleware...)
+	setRouter.Use(middleware.WithTransaction())
+	setRouter.HandleFunc("", c.Create).Methods(http.MethodPost)
+	setRouter.HandleFunc("/{id:[0-9]+}", c.PostEdit).Methods(http.MethodPost)
 }
 
 func (c *ProductsController) handleError(w http.ResponseWriter, err error) {
@@ -81,9 +78,16 @@ func (c *ProductsController) preparePageContext(r *http.Request, titleKey string
 }
 
 func (c *ProductsController) getViewModelProducts(r *http.Request) (*PaginatedResponse, error) {
-	params := composables.UsePaginated(r)
-
-	productEntities, err := c.productService.GetPaginated(r.Context(), params.Limit, params.Offset, []string{})
+	paginationParams := composables.UsePaginated(r)
+	params, err := composables.UseQuery(&product.FindParams{
+		Limit:  paginationParams.Limit,
+		Offset: paginationParams.Offset,
+		SortBy: []string{"created_at desc"},
+	}, r)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving query: %w", err)
+	}
+	productEntities, err := c.productService.GetPaginated(r.Context(), params)
 	if err != nil {
 		return nil, fmt.Errorf("error retrieving products: %w", err)
 	}
@@ -97,7 +101,7 @@ func (c *ProductsController) getViewModelProducts(r *http.Request) (*PaginatedRe
 
 	return &PaginatedResponse{
 		Products:        viewProducts,
-		PaginationState: pagination.New(c.basePath, params.Page, int(total), params.Limit),
+		PaginationState: pagination.New(c.basePath, paginationParams.Page, int(total), params.Limit),
 	}, nil
 }
 
@@ -190,25 +194,24 @@ func (c *ProductsController) PostEdit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case shared.FormActionSave:
-		dto := product.UpdateDTO{}
 		pageCtx, err := c.preparePageContext(r, "Products.Edit.Meta.Title")
 		if err != nil {
 			c.handleError(w, err)
 			return
 		}
 
-		if err := shared.Decoder.Decode(&dto, r.Form); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+		dto, err := composables.UseForm(&product.UpdateDTO{}, r)
+		if err != nil {
+			c.handleError(w, fmt.Errorf("error parsing form: %w", err))
 			return
 		}
 
+		entity, err := c.productService.GetByID(r.Context(), id)
+		if err != nil {
+			c.handleError(w, fmt.Errorf("error retrieving product: %w", err))
+			return
+		}
 		if errorsMap, ok := dto.Ok(pageCtx.UniTranslator); !ok {
-			entity, err := c.productService.GetByID(r.Context(), id)
-			if err != nil {
-				c.handleError(w, fmt.Errorf("error retrieving product: %w", err))
-				return
-			}
-
 			props := &products.EditPageProps{
 				PageContext: pageCtx,
 				Product:     mappers.ProductToViewModel(entity),
@@ -218,7 +221,20 @@ func (c *ProductsController) PostEdit(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := c.productService.Update(r.Context(), id, &dto); err != nil {
+		if err := c.productService.Update(r.Context(), id, dto); err != nil {
+			var vErr serrors.BaseError
+			if errors.As(err, &vErr) {
+				entity.Rfid = dto.Rfid
+				props := &products.EditPageProps{
+					PageContext: pageCtx,
+					Errors: map[string]string{
+						"Rfid": vErr.Localize(pageCtx.Localizer),
+					},
+					Product: mappers.ProductToViewModel(entity),
+				}
+				c.renderTemplate(w, r, products.EditForm(props))
+				return
+			}
 			c.handleError(w, err)
 			return
 		}
@@ -243,13 +259,8 @@ func (c *ProductsController) GetNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *ProductsController) Create(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	dto := product.CreateDTO{}
-	if err := shared.Decoder.Decode(&dto, r.Form); err != nil {
+	dto, err := composables.UseForm(&product.CreateDTO{}, r)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -260,13 +271,12 @@ func (c *ProductsController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	entity, err := dto.ToEntity()
+	if err != nil {
+		c.handleError(w, err)
+		return
+	}
 	if errorsMap, ok := dto.Ok(pageCtx.UniTranslator); !ok {
-		entity, err := dto.ToEntity()
-		if err != nil {
-			c.handleError(w, err)
-			return
-		}
-
 		props := &products.CreatePageProps{
 			PageContext: pageCtx,
 			Errors:      errorsMap,
@@ -277,7 +287,20 @@ func (c *ProductsController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := c.productService.Create(r.Context(), &dto); err != nil {
+	if err := c.productService.Create(r.Context(), dto); err != nil {
+		var vErr serrors.BaseError
+		if errors.As(err, &vErr) {
+			props := &products.CreatePageProps{
+				PageContext: pageCtx,
+				Errors: map[string]string{
+					"Rfid": vErr.Localize(pageCtx.Localizer),
+				},
+				Product: mappers.ProductToViewModel(entity),
+				SaveURL: c.basePath,
+			}
+			c.renderTemplate(w, r, products.CreateForm(props))
+			return
+		}
 		c.handleError(w, err)
 		return
 	}

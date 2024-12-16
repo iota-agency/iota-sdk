@@ -1,8 +1,9 @@
 package controllers
 
 import (
-	"github.com/iota-agency/iota-sdk/pkg/middleware"
 	"net/http"
+
+	"github.com/iota-agency/iota-sdk/pkg/middleware"
 
 	"github.com/a-h/templ"
 	"github.com/go-faster/errors"
@@ -43,22 +44,26 @@ func NewPaymentsController(app application.Application) application.Controller {
 }
 
 func (c *PaymentsController) Register(r *mux.Router) {
-	router := r.PathPrefix(c.basePath).Subrouter()
-	router.Use(
-		middleware.WithTransaction(),
+	commonMiddleware := []mux.MiddlewareFunc{
 		middleware.Authorize(),
 		middleware.RequireAuthorization(),
 		middleware.ProvideUser(),
 		middleware.Tabs(),
 		middleware.WithLocalizer(c.app.Bundle()),
 		middleware.NavItems(c.app),
-	)
-	router.HandleFunc("", c.Payments).Methods(http.MethodGet)
-	router.HandleFunc("", c.CreatePayment).Methods(http.MethodPost)
-	router.HandleFunc("/new", c.GetNew).Methods(http.MethodGet)
-	router.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)
-	router.HandleFunc("/{id:[0-9]+}", c.PostEdit).Methods(http.MethodPost)
-	router.HandleFunc("/{id:[0-9]+}", c.DeletePayment).Methods(http.MethodDelete)
+	}
+	getRouter := r.PathPrefix(c.basePath).Subrouter()
+	getRouter.Use(commonMiddleware...)
+	getRouter.HandleFunc("", c.Payments).Methods(http.MethodGet)
+	getRouter.HandleFunc("/new", c.GetNew).Methods(http.MethodGet)
+	getRouter.HandleFunc("/{id:[0-9]+}", c.GetEdit).Methods(http.MethodGet)
+
+	setRouter := r.PathPrefix(c.basePath).Subrouter()
+	setRouter.Use(commonMiddleware...)
+	setRouter.Use(middleware.WithTransaction())
+	setRouter.HandleFunc("", c.CreatePayment).Methods(http.MethodPost)
+	setRouter.HandleFunc("/{id:[0-9]+}", c.PostEdit).Methods(http.MethodPost)
+	setRouter.HandleFunc("/{id:[0-9]+}", c.DeletePayment).Methods(http.MethodDelete)
 }
 
 func (c *PaymentsController) viewModelPayment(r *http.Request) (*viewmodels.Payment, error) {
@@ -82,8 +87,13 @@ func (c *PaymentsController) viewModelAccounts(r *http.Request) ([]*viewmodels.M
 }
 
 func (c *PaymentsController) viewModelPayments(r *http.Request) (*PaymentPaginatedResponse, error) {
-	params := composables.UsePaginated(r)
-	paymentEntities, err := c.paymentService.GetPaginated(r.Context(), params.Limit, params.Offset, []string{})
+	paginationParams := composables.UsePaginated(r)
+	params, err := composables.UseQuery(&payment.FindParams{
+		Limit:  paginationParams.Limit,
+		Offset: paginationParams.Offset,
+		SortBy: []string{"created_at desc"},
+	}, r)
+	paymentEntities, err := c.paymentService.GetPaginated(r.Context(), params)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error retrieving payments")
 	}
@@ -95,7 +105,7 @@ func (c *PaymentsController) viewModelPayments(r *http.Request) (*PaymentPaginat
 
 	return &PaymentPaginatedResponse{
 		Payments:        viewPayments,
-		PaginationState: pagination.New(c.basePath, params.Page, int(total), params.Limit),
+		PaginationState: pagination.New(c.basePath, paginationParams.Page, int(total), params.Limit),
 	}, nil
 }
 

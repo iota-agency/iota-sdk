@@ -2,6 +2,8 @@ package persistence
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/iota-agency/iota-sdk/modules/warehouse/domain/aggregates/position"
 	"github.com/iota-agency/iota-sdk/modules/warehouse/persistence/models"
 	"github.com/iota-agency/iota-sdk/pkg/composables"
@@ -31,16 +33,22 @@ func (g *GormPositionRepository) GetPaginated(
 	if err != nil {
 		return nil, err
 	}
-	q := tx.Limit(params.Limit).Offset(params.Offset)
-	q, err = helpers.ApplySort(q, params.SortBy)
+	tx = tx.Limit(params.Limit).Offset(params.Offset)
+	if params.CreatedAt.To != "" && params.CreatedAt.From != "" {
+		tx = tx.Where("warehouse_positions.created_at BETWEEN ? and ?", params.CreatedAt.From, params.CreatedAt.To)
+	}
+	if params.Query != "" && params.Field != "" {
+		tx = tx.Where(fmt.Sprintf("%s::varchar ILIKE ?", params.Field), "%"+params.Query+"%")
+	}
+	if params.UnitID != "" {
+		tx = tx.Where("unit_id = ?", params.UnitID)
+	}
+	tx, err = helpers.ApplySort(tx, params.SortBy)
 	if err != nil {
 		return nil, err
 	}
-	if params.Search != "" {
-		q = q.Where("title ILIKE ?", "%"+params.Search+"%")
-	}
 	var entities []*models.WarehousePosition
-	if err := q.Find(&entities).Error; err != nil {
+	if err := tx.Find(&entities).Error; err != nil {
 		return nil, err
 	}
 	return mapping.MapDbModels(entities, toDomainPosition)
@@ -80,6 +88,18 @@ func (g *GormPositionRepository) GetByID(ctx context.Context, id uint) (*positio
 		return nil, err
 	}
 	return toDomainPosition(&entity)
+}
+
+func (g *GormPositionRepository) GetByIDs(ctx context.Context, ids []uint) ([]*position.Position, error) {
+	tx, err := g.tx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var entities []*models.WarehousePosition
+	if err := tx.Where("id IN ?", ids).Find(&entities).Error; err != nil {
+		return nil, err
+	}
+	return mapping.MapDbModels(entities, toDomainPosition)
 }
 
 func (g *GormPositionRepository) GetByBarcode(ctx context.Context, barcode string) (*position.Position, error) {

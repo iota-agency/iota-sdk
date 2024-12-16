@@ -2,11 +2,19 @@ package position
 
 import "context"
 
+type DateRange struct {
+	From string
+	To   string
+}
+
 type FindParams struct {
-	Limit  int
-	Offset int
-	SortBy []string
-	Search string
+	Limit     int
+	Offset    int
+	SortBy    []string
+	Query     string
+	Field     string
+	UnitID    string
+	CreatedAt DateRange
 }
 
 type Repository interface {
@@ -14,6 +22,7 @@ type Repository interface {
 	GetAll(ctx context.Context) ([]*Position, error)
 	GetPaginated(ctx context.Context, params *FindParams) ([]*Position, error)
 	GetByID(ctx context.Context, id uint) (*Position, error)
+	GetByIDs(ctx context.Context, ids []uint) ([]*Position, error)
 	GetByBarcode(ctx context.Context, barcode string) (*Position, error)
 	Create(ctx context.Context, data *Position) error
 	CreateOrUpdate(ctx context.Context, data *Position) error

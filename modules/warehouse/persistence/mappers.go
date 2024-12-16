@@ -32,12 +32,15 @@ func toDomainUnit(dbUnit *models.WarehouseUnit) *unit.Unit {
 }
 
 func toDBOrder(data *order.Order) (*models.WarehouseOrder, []*models.WarehouseOrderItem) {
-	dbItems, _ := mapping.MapDbModels(data.Products, func(p *product.Product) (*models.WarehouseOrderItem, error) {
-		return &models.WarehouseOrderItem{
-			ProductID: p.ID,
-			CreatedAt: data.CreatedAt,
-		}, nil
-	})
+	var dbItems []*models.WarehouseOrderItem
+	for _, item := range data.Items {
+		for _, p := range item.Products {
+			dbItems = append(dbItems, &models.WarehouseOrderItem{
+				ProductID: p.ID,
+				CreatedAt: data.CreatedAt,
+			})
+		}
+	}
 	return &models.WarehouseOrder{
 		ID:        data.ID,
 		Status:    string(data.Status),
@@ -47,23 +50,40 @@ func toDBOrder(data *order.Order) (*models.WarehouseOrder, []*models.WarehouseOr
 }
 
 func toDomainOrder(dbOrder *models.WarehouseOrder) (*order.Order, error) {
-	products, err := mapping.MapDbModels(dbOrder.Products, toDomainProduct)
-	if err != nil {
-		return nil, err
-	}
 	status, err := order.NewStatus(dbOrder.Status)
 	if err != nil {
 		return nil, err
 	}
-	typeEnum, err := order.NewType(dbOrder.Type)
+	orderType, err := order.NewType(dbOrder.Type)
 	if err != nil {
 		return nil, err
+	}
+	var idToPosition = make(map[uint]*models.WarehousePosition)
+	var groupedByPositionID = make(map[uint][]*models.WarehouseProduct)
+	for _, p := range dbOrder.Products {
+		idToPosition[p.PositionID] = p.Position
+		groupedByPositionID[p.PositionID] = append(groupedByPositionID[p.PositionID], p)
+	}
+	var items []order.Item
+	for positionID, products := range groupedByPositionID {
+		domainProducts, err := mapping.MapDbModels(products, toDomainProduct)
+		if err != nil {
+			return nil, err
+		}
+		positionEntity, err := toDomainPosition(idToPosition[positionID])
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, order.Item{
+			Position: *positionEntity,
+			Products: mapping.ValueSlice(domainProducts),
+		})
 	}
 	return &order.Order{
 		ID:        dbOrder.ID,
 		Status:    status,
-		Type:      typeEnum,
-		Products:  products,
+		Type:      orderType,
+		Items:     items,
 		CreatedAt: dbOrder.CreatedAt,
 	}, nil
 }

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/iota-agency/iota-sdk/components/base"
 	"github.com/iota-agency/iota-sdk/components/base/button"
-	"github.com/iota-agency/iota-sdk/components/base/input"
 	"github.com/iota-agency/iota-sdk/components/base/pagination"
+	"github.com/iota-agency/iota-sdk/components/filters"
 	"github.com/iota-agency/iota-sdk/modules/warehouse/viewmodels"
+	"github.com/iota-agency/iota-sdk/pkg/composables"
 	"github.com/iota-agency/iota-sdk/pkg/presentation/templates/icons"
 	"github.com/iota-agency/iota-sdk/pkg/presentation/templates/layouts"
 	"github.com/iota-agency/iota-sdk/pkg/types"
@@ -24,6 +25,8 @@ templ OrdersTable(props *IndexPageProps) {
 			Columns: []*base.TableColumn{
 				{Label: props.T("WarehouseOrders.List.Type"), Key: "title"},
 				{Label: props.T("WarehouseOrders.List.Status"), Key: "shortTitle"},
+				{Label: props.T("WarehouseOrders.List.Positions"), Key: "positions"},
+				{Label: props.T("WarehouseOrders.List.Products"), Key: "products"},
 				{Label: props.T("CreatedAt"), Key: "updatedAt"},
 				{Label: props.T("Actions"), Class: "w-16"},
 			},
@@ -31,10 +34,16 @@ templ OrdersTable(props *IndexPageProps) {
 			for _, order := range props.Orders {
 				@base.TableRow() {
 					@base.TableCell() {
-						{ order.Type }
+						{ order.LocalizedType(props.Localizer) }
 					}
 					@base.TableCell() {
-						{ order.Status }
+						{ order.LocalizedStatus(props.Localizer) }
+					}
+					@base.TableCell() {
+						{ order.DistinctPositions() }
+					}
+					@base.TableCell() {
+						{ order.TotalProducts() }
 					}
 					@base.TableCell() {
 						<div x-data="relativeformat">
@@ -42,8 +51,13 @@ templ OrdersTable(props *IndexPageProps) {
 						</div>
 					}
 					@base.TableCell() {
-						@button.Secondary(button.Props{Fixed: true, Size: button.SizeSM, Class: "btn-fixed", Href: fmt.Sprintf("/warehouse/orders/%s", order.ID)}) {
-							@icons.PencilSimple(icons.Props{Size: "20"})
+						@button.Secondary(button.Props{
+							Fixed: true,
+							Size:  button.SizeSM,
+							Class: "btn-fixed",
+							Href:  fmt.Sprintf("/warehouse/orders/%s", order.ID),
+						}) {
+							@icons.Eye(icons.Props{Size: "20"})
 						}
 					}
 				}
@@ -53,6 +67,15 @@ templ OrdersTable(props *IndexPageProps) {
 			@pagination.Pagination(props.PaginationState)
 		}
 	</div>
+}
+
+templ newOrderButton() {
+	<summary class="btn btn-primary btn-normal btn-with-icon shrink-0 cursor-pointer">
+		@icons.PlusCircle(icons.Props{Size: "18"})
+		<p class="break-keep">
+			{ composables.MustT(ctx, "WarehouseOrders.List.New") }
+		</p>
+	</summary>
 }
 
 templ OrdersContent(props *IndexPageProps) {
@@ -68,37 +91,48 @@ templ OrdersContent(props *IndexPageProps) {
 				hx-target=".table-wrapper"
 				hx-swap="outerHTML"
 			>
-				@input.Text(&input.Props{
-					Addon: &input.Addon{
-						Position:  input.AddonLeft,
-						Component: icons.MagnifyingGlass(icons.Props{Size: "20"}),
-					},
-					Placeholder: props.T("Search"),
-					Attrs: templ.Attributes{
-						"name": "name",
-					},
-				})
 				@base.Select(&base.SelectProps{
-					Prefix: props.T("PerPage"),
 					Attrs: templ.Attributes{
-						"name": "limit",
+						"name": "Status",
 					},
 				}) {
-					<option>15</option>
-					<option>25</option>
-					<option>50</option>
-					<option>100</option>
+					<option disabled selected>{ props.T("WarehouseOrders.List.Status") }</option>
+					<option value="">
+						{ props.T("All") }
+					</option>
+					<option value="pending">
+						{ props.T("WarehouseOrders.Statuses.pending") }
+					</option>
+					<option value="complete">
+						{ props.T("WarehouseOrders.Statuses.complete") }
+					</option>
 				}
-				@base.Select(&base.SelectProps{Placeholder: props.T("CreatedAt")}) {
-					<option>Yesterday</option>
-					<option>The day before yesterday</option>
-				}
-				@button.Primary(button.Props{
-					Size: button.SizeNormal,
-					Href: "/warehouse/orders/new",
-					Icon: icons.PlusCircle(icons.Props{Size: "18"}),
+				@base.Select(&base.SelectProps{
+					Attrs: templ.Attributes{
+						"name": "Type",
+					},
 				}) {
-					{ props.T("WarehouseOrders.List.New") }
+					<option disabled selected>{ props.T("WarehouseOrders.List.Type") }</option>
+					<option value="">
+						{ props.T("All") }
+					</option>
+					<option value="in">
+						{ props.T("WarehouseOrders.Types.in") }
+					</option>
+					<option value="out">
+						{ props.T("WarehouseOrders.Types.out") }
+					</option>
+				}
+				@filters.PageSize(props.PageContext)
+				@filters.CreatedAt(props.PageContext)
+				<div class="flex-grow"></div>
+				@base.DetailsDropdown(newOrderButton()) {
+					@base.DropdownItem(base.DropdownItemProps{Href: "/warehouse/orders/in/new"}) {
+						{ props.T("WarehouseOrders.List.NewIn") }
+					}
+					@base.DropdownItem(base.DropdownItemProps{Href: "/warehouse/orders/out/new"}) {
+						{ props.T("WarehouseOrders.List.NewOut") }
+					}
 				}
 			</form>
 			@OrdersTable(props)
